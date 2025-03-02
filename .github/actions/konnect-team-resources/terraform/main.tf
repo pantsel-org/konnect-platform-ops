@@ -34,41 +34,41 @@ module "control_planes" {
   # cacert       = var.cacert
 }
 
-module "vaults" {
-  source = "./modules/vault"
+# module "vaults" {
+#   source = "./modules/vault"
 
-  for_each = { for k, v in module.control_planes : v.control_plane.name => {
-    name = v.control_plane.name, id = v.control_plane.id
-    type = "Control Planes"
-  } }
+#   for_each = { for k, v in module.control_planes : v.control_plane.name => {
+#     name = v.control_plane.name, id = v.control_plane.id
+#     type = "Control Planes"
+#   } }
 
-  control_plane_name = lower(replace(each.value.name, " ", "-"))
-  control_plane_id   = each.value.id
-}
+#   control_plane_name = lower(replace(each.value.name, " ", "-"))
+#   control_plane_id   = each.value.id
+# }
 
 
-module "api_products" {
-  source = "./modules/api_product"
+# module "api_products" {
+#   source = "./modules/api_product"
 
-  for_each = { for product in local.api_products : product.name => product }
+#   for_each = { for product in local.api_products : product.name => product }
 
-  name          = each.value.name
-  description   = each.value.description
-  labels        = lookup(each.value, "labels", {})
-  public_labels = lookup(each.value, "public_labels", {})
-}
+#   name          = each.value.name
+#   description   = each.value.description
+#   labels        = lookup(each.value, "labels", {})
+#   public_labels = lookup(each.value, "public_labels", {})
+# }
 
-module "team_role" {
-  source = "./modules/team_role"
+# module "team_role" {
+#   source = "./modules/team_role"
 
-  team           = {
-    id   = lookup(local.team, "id", "")
-    name = lookup(local.team, "name", "")
-  }
-  region         = lookup(local.metadata, "region", "")
-  control_planes = [for k, v in module.control_planes : v.control_plane]
-  api_products   = [for k, v in module.api_products : v.api_product]
-}
+#   team           = {
+#     id   = lookup(local.team, "id", "")
+#     name = lookup(local.team, "name", "")
+#   }
+#   region         = lookup(local.metadata, "region", "")
+#   control_planes = [for k, v in module.control_planes : v.control_plane]
+#   api_products   = [for k, v in module.api_products : v.api_product]
+# }
 
 # module "system_accounts" {
 #   source = "./modules/system_account"
