@@ -47,16 +47,16 @@ module "vaults" {
 }
 
 
-# module "api_products" {
-#   source = "./modules/api_product"
+module "api_products" {
+  source = "./modules/api_product"
 
-#   for_each = { for product in local.api_products : product.name => product }
+  for_each = { for product in local.api_products : product.name => product }
 
-#   name          = each.value.name
-#   description   = each.value.description
-#   labels        = lookup(each.value, "labels", {})
-#   public_labels = lookup(each.value, "public_labels", {})
-# }
+  name          = each.value.name
+  description   = each.value.description
+  labels        = lookup(each.value, "labels", {})
+  public_labels = lookup(each.value, "public_labels", {})
+}
 
 # module "team_role" {
 #   source = "./modules/team_role"
