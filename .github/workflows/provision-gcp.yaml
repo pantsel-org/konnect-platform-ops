@@ -1,0 +1,91 @@
+name: Provision GCP resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        default: 'provision'
+        options:
+          - 'provision'
+          - 'destroy'
+      aws_region:
+        description: "AWS region"
+        required: true
+        default: "eu-central-1"
+      environment:
+        description: 'Environment to provision'
+        type: choice
+        default: 'dev'
+        options:
+          - 'dev'
+          - 'tst'
+          - 'acc'
+          - 'prd'
+
+env:
+  AWS_S3_BUCKET: "gcp.resources"
+  TERRAFORM_DIR: ${{ github.workspace }}/terraform/gcp
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ inputs.aws_region }}
+  TF_VAR_vault_root_token: ${{ secrets.VAULT_TOKEN }}
+
+jobs:
+  provision-gcp-resources:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "latest"
+
+      # ToDo: Use Workload Identity Federation instead
+      - name: Authenticate with Google Cloud
+        run: |
+          echo "$GCP_CREDENTIALS" > gcp-key.json
+          echo "TF_VAR_gcp_credentials=$PWD/gcp-key.json" >> $GITHUB_ENV
+        shell: bash
+        env:
+          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Terraform Init
+        shell: bash
+        run: |
+          terraform init -upgrade \
+            -backend-config=config.aws.s3.tfbackend \
+            -backend-config="bucket=$AWS_S3_BUCKET" \
+            -backend-config="key=tfstate" \
+            -backend-config="region=$AWS_REGION" \
+            -backend-config="access_key=$AWS_ACCESS_KEY_ID" \
+            -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Terraform Plan
+        shell: bash
+        if: ${{ inputs.action == 'provision' }}
+        run: |
+          terraform plan -out=tfplan
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Terraform Apply
+        shell: bash
+        if: ${{ inputs.action == 'provision' }}
+        id: tfapply
+        run: |
+          terraform apply -auto-approve tfplan
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Terraform destroy
+        shell: bash
+        if: ${{ inputs.action == 'destroy' }}
+        run: |
+          terraform destroy -auto-approve
+        working-directory: ${{ env.TERRAFORM_DIR }}

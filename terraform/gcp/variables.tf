@@ -18,3 +18,5 @@ variable "vault_root_token" {
   description = "The root token for the vault"
   type    = string
 }
+
+variable "gcp_credentials" {}

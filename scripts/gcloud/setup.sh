@@ -5,6 +5,7 @@ VAULT_STORAGE_BUCKET=kpo-vault-storage
 
 gcloud services enable run.googleapis.com \
     cloudbuild.googleapis.com \
+    cloudresourcemanager.googleapis.com \
     secretmanager.googleapis.com \
     sqladmin.googleapis.com \
     iam.googleapis.com
