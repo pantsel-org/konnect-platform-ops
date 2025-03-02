@@ -91,6 +91,8 @@ runs:
         SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id teams/${{ env.TEAM_NAME }}/secrets/konnect-sa-${{ env.TEAM_NAME }} --query SecretString --output text)
         TOKEN_VALUE=$(echo $SECRET_JSON | jq -r '.token')
 
+        # mask the token
+        echo "::add-mask::$TOKEN_VALUE"
         echo "SYSTEM_ACCOUNT_TOKEN=$TOKEN_VALUE" >> $GITHUB_ENV
 
     - name: Fetch team information
@@ -120,7 +122,7 @@ runs:
         fi
 
         # Save the control plane info to an output variable
-        echo "::set-output name=team::$( echo $response_body | jq -c .data[0])"
+        echo "TEAM=$(echo $response_body | jq -c .data[0])" >> $GITHUB_ENV
       shell: bash
 
     # - name: Authenticate to MinIO using OIDC token
