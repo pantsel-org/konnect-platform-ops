@@ -139,13 +139,14 @@ runs:
     - name: Retrieve Temporary AWS Credentials
       shell: bash
       run: |
-        export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
-        export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
-        export AWS_SESSION_TOKEN=$(aws configure get aws_session_token)
+        env
+        # export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
+        # export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
+        # export AWS_SESSION_TOKEN=$(aws configure get aws_session_token)
 
-        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
+        # echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+        # echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+        # echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
 
     
 
