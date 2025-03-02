@@ -7,7 +7,7 @@
     "resources": [
         {
             "type": "konnect.team",
-            "name": "Kronos",
+            "name": "kronos",
             "description": "Kronos team is building IaC services",
             "labels": {
                 "TID": "KTEAM_00001"
@@ -15,7 +15,7 @@
         },
         {
             "type": "konnect.team",
-            "name": "Tiger",
+            "name": "tiger",
             "description": "Tiger team is building the Global Observability Platform",
             "labels": {
                 "TID": "KTEAM_00002"
@@ -23,7 +23,7 @@
         },
         {
             "type": "konnect.team",
-            "name": "Gorillaz",
+            "name": "gorillaz",
             "offboarded": true,
             "description": "Gorillaz team is building the legacy services",
             "labels": {
