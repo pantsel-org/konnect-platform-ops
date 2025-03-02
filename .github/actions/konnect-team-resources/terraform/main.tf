@@ -70,31 +70,31 @@ module "team_role" {
   api_products   = [for k, v in module.api_products : v.api_product]
 }
 
-module "system_accounts" {
-  source = "./modules/system_account"
+# module "system_accounts" {
+#   source = "./modules/system_account"
 
-  for_each = merge(
-    { for k, v in module.control_planes : v.control_plane.name => {
-      name = v.control_plane.name, id = v.control_plane.id
-      type = "Control Planes"
-    } },
+#   for_each = merge(
+#     { for k, v in module.control_planes : v.control_plane.name => {
+#       name = v.control_plane.name, id = v.control_plane.id
+#       type = "Control Planes"
+#     } },
 
-    { for k, v in module.api_products : v.api_product.name => {
-      name = v.api_product.name, id = v.api_product.id
-      type = "API Products"
-    } }
-  )
+#     { for k, v in module.api_products : v.api_product.name => {
+#       name = v.api_product.name, id = v.api_product.id
+#       type = "API Products"
+#     } }
+#   )
 
-  name             = lower(replace("sa-${each.value.name}-${local.short_names[each.value.type]}-admin", " ", "-"))
-  description      = "Admin System account for ${each.value.type} ${each.value.name}"
-  entity_id        = each.value.id
-  entity_type_name = each.value.type
-  role_name        = "Admin"
-  expiration_date  = local.expiration_date
-  region           = lookup(local.metadata, "region", "")
-}
+#   name             = lower(replace("sa-${each.value.name}-${local.short_names[each.value.type]}-admin", " ", "-"))
+#   description      = "Admin System account for ${each.value.type} ${each.value.name}"
+#   entity_id        = each.value.id
+#   entity_type_name = each.value.type
+#   role_name        = "Admin"
+#   expiration_date  = local.expiration_date
+#   region           = lookup(local.metadata, "region", "")
+# }
 
-output "system_account_access_tokens" {
-  value     = { for k, v in module.system_accounts : k => v.access_token }
-  sensitive = true
-}
+# output "system_account_access_tokens" {
+#   value     = { for k, v in module.system_accounts : k => v.access_token }
+#   sensitive = true
+# }
