@@ -131,7 +131,7 @@ runs:
         fi
 
         # Save the control plane info to an output variable
-        echo "TEAM=$(echo $response_body | jq -c .data[0])" >> $GITHUB_ENV
+        echo "TF_VAR_team=$(echo $response_body | jq -c .data[0])" >> $GITHUB_ENV
       shell: bash
 
     - name: Assume S3 Access Role
@@ -165,8 +165,6 @@ runs:
           -backend-config="bucket=konnect.team.$TEAM_NAME" \
           -backend-config="key=tfstate" \
           -backend-config="region=${{ inputs.aws_region }}"
-      env:
-        TF_VAR_team: ${{ env.TEAM }}
       working-directory: ${{env.TERRAFORM_DIR}}
 
     - name: Terraform Plan
@@ -174,8 +172,6 @@ runs:
       if: ${{ inputs.action == 'provision' }}
       run: |
         terraform plan -out=tfplan
-      env:
-        TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
       working-directory: ${{env.TERRAFORM_DIR}}
 
     - name: Terraform Apply
@@ -184,9 +180,7 @@ runs:
       id: tfapply
       run: |
         terraform apply -auto-approve tfplan
-        echo "$(terraform-bin output -json system_account_access_tokens)" > system_account_tokens.json
-      env:
-        TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
+        # echo "$(terraform-bin output -json system_account_access_tokens)" > system_account_tokens.json
       working-directory: ${{env.TERRAFORM_DIR}}
 
     # - name: Store System Account tokens in Vault
@@ -212,6 +206,4 @@ runs:
       if: ${{ inputs.action == 'destroy' }}
       run: |
         terraform destroy -auto-approve
-      env:
-        TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
       working-directory: ${{env.TERRAFORM_DIR}}
