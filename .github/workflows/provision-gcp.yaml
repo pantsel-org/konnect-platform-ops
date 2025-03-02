@@ -15,6 +15,10 @@ on:
         description: "AWS region"
         required: true
         default: "eu-central-1"
+      gcp_region:
+        description: "GCP region"
+        required: true
+        default: "europe-west4"
       environment:
         description: 'Environment to provision'
         type: choice
@@ -27,6 +31,8 @@ on:
 
 env:
   AWS_S3_BUCKET: "gcp.resources"
+  GCP_VAULT_STORAGE_BUCKET: "kpo-vault-storage"
+  GCP_PROJECT: "konnect-platform-ops"
   TERRAFORM_DIR: ${{ github.workspace }}/terraform/gcp
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -46,6 +52,11 @@ jobs:
         with:
           terraform_version: "latest"
 
+      - name: 'Set up GCloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
       # ToDo: Use Workload Identity Federation instead
       - name: Authenticate with Google Cloud
         run: |
@@ -54,6 +65,27 @@ jobs:
         shell: bash
         env:
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Init setup
+        shell: bash
+        run: |
+
+          gcloud auth activate-service-account terraform-sa@konnect-platform-ops.iam.gserviceaccount.com --key-file=gcp-key.json
+
+          gcloud config set project ${{ env.GCP_PROJECT }}
+
+          gcloud services enable run.googleapis.com \
+            cloudbuild.googleapis.com \
+            cloudresourcemanager.googleapis.com \
+            secretmanager.googleapis.com \
+            sqladmin.googleapis.com \
+            iam.googleapis.com --project ${{ env.GCP_PROJECT }}
+
+          if ! gsutil ls -b gs://${{ env.GCP_VAULT_STORAGE_BUCKET }}; then
+            gsutil mb -l ${{ inputs.gcp_region }} gs://${{ env.GCP_VAULT_STORAGE_BUCKET }}/
+          fi
+
         working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Terraform Init
