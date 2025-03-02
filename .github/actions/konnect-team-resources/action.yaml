@@ -156,9 +156,7 @@ runs:
           -backend-config=config.aws.s3.tfbackend \
           -backend-config="bucket=konnect.team.$TEAM_NAME" \
           -backend-config="key=tfstate" \
-          -backend-config="region=${{ inputs.aws_region }}" \
-          -backend-config="access_key=${{ env.AWS_ACCESS_KEY_ID }}" \
-          -backend-config="secret_key=${{ env.AWS_SECRET_ACCESS_KEY }}"
+          -backend-config="region=${{ inputs.aws_region }}"
       env:
         TF_VAR_team: ${{ env.TEAM }}
       working-directory: ${{env.TERRAFORM_DIR}}
