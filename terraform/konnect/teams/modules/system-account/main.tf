@@ -27,6 +27,13 @@ resource "konnect_system_account_team" "this" {
   account_id = konnect_system_account.this.id
 }
 
+# Assign systen account to org read only team
+# resource "konnect_system_account_team" "org_admin_ro" {
+#   team_id =  "34419646-a48f-4b83-af35-e8f7a521887a"
+
+#   account_id = konnect_system_account.this.id
+# }
+
 ### Add the control plane creator role to every team system account
 resource "konnect_system_account_role" "cp_creators" {
 
