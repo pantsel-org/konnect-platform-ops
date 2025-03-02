@@ -79,7 +79,6 @@ runs:
 
     - name: Configure AWS Credentials for Secrets Manager
       uses: aws-actions/configure-aws-credentials@v4
-      shell: bash
       with:
         role-to-assume: "arn:aws:iam::${{ inputs.aws_account_id }}:role/gh-actions-$TEAM_NAME_NORMALIZED-secretsRole"
         aws-region: eu-central-1
