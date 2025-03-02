@@ -9,7 +9,6 @@ variable "team" {
 variable "region" {
   description = "Region where the system account is created"
   type        = string
-  default     = ""
 }
 
 variable "control_planes" {
