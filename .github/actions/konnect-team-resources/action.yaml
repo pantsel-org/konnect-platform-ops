@@ -95,6 +95,7 @@ runs:
         # mask the token
         echo "::add-mask::$TOKEN_VALUE"
         echo "SYSTEM_ACCOUNT_TOKEN=$TOKEN_VALUE" >> $GITHUB_ENV
+        echo "TF_VAR_konnect_access_token=$TOKEN_VALUE" >> $GITHUB_ENV
 
     - name: Fetch team information
       id: fetch-team
