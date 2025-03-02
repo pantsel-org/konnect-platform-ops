@@ -170,16 +170,16 @@ runs:
         TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
       working-directory: ${{env.TERRAFORM_DIR}}
 
-    # - name: Terraform Apply
-    #   shell: bash
-    #   if: ${{ inputs.action == 'provision' }}
-    #   id: tfapply
-    #   run: |
-    #     terraform apply -auto-approve tfplan
-    #     echo "$(terraform-bin output -json system_account_access_tokens)" > system_account_tokens.json
-    #   env:
-    #     TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
-    #   working-directory: ${{env.TERRAFORM_DIR}}
+    - name: Terraform Apply
+      shell: bash
+      if: ${{ inputs.action == 'provision' }}
+      id: tfapply
+      run: |
+        terraform apply -auto-approve tfplan
+        echo "$(terraform-bin output -json system_account_access_tokens)" > system_account_tokens.json
+      env:
+        TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
+      working-directory: ${{env.TERRAFORM_DIR}}
 
     # - name: Store System Account tokens in Vault
     #   shell: bash
@@ -199,11 +199,11 @@ runs:
     #     done
     #   working-directory: ${{env.TERRAFORM_DIR}}
 
-    # - name: Terraform destroy
-    #   shell: bash
-    #   if: ${{ inputs.action == 'destroy' }}
-    #   run: |
-    #     terraform destroy -auto-approve
-    #   env:
-    #     TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
-    #   working-directory: ${{env.TERRAFORM_DIR}}
+    - name: Terraform destroy
+      shell: bash
+      if: ${{ inputs.action == 'destroy' }}
+      run: |
+        terraform destroy -auto-approve
+      env:
+        TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
+      working-directory: ${{env.TERRAFORM_DIR}}
