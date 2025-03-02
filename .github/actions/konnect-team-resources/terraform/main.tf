@@ -58,17 +58,17 @@ module "api_products" {
   public_labels = lookup(each.value, "public_labels", {})
 }
 
-module "team_role" {
-  source = "./modules/team_role"
+# module "team_role" {
+#   source = "./modules/team_role"
 
-  team           = {
-    id   = lookup(local.team, "id", "")
-    name = lookup(local.team, "name", "")
-  }
-  region         = lookup(local.metadata, "region", "")
-  control_planes = [for k, v in module.control_planes : v.control_plane]
-  api_products   = [for k, v in module.api_products : v.api_product]
-}
+#   team           = {
+#     id   = lookup(local.team, "id", "")
+#     name = lookup(local.team, "name", "")
+#   }
+#   region         = lookup(local.metadata, "region", "")
+#   control_planes = [for k, v in module.control_planes : v.control_plane]
+#   api_products   = [for k, v in module.api_products : v.api_product]
+# }
 
 # module "system_accounts" {
 #   source = "./modules/system_account"
