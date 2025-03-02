@@ -65,14 +65,14 @@ runs:
     - name: Set resource variables from config file
       run: |
         config_content=${{ inputs.config }}
+        REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
         RESOURCE_TYPE=$(echo "$config_content" | jq -r '.metadata.type')
-        TEAM_NAME=$(echo "$config_content" | jq -r '.metadata.team')
-        TEAM_NAME_NORMALIZED=$(echo "$TEAM_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+
+        TEAM_NAME=$(echo $REPO_NAME | sed 's/-krg//')
         TERRAFORM_DIR=${{ github.action_path }}/terraform
         
         echo "RESOURCE_TYPE=$RESOURCE_TYPE" >> $GITHUB_ENV
         echo "TEAM_NAME=$TEAM_NAME" >> $GITHUB_ENV
-        echo "TEAM_NAME_NORMALIZED=$TEAM_NAME_NORMALIZED" >> $GITHUB_ENV
         echo "TERRAFORM_DIR=$TERRAFORM_DIR" >> $GITHUB_ENV
         echo "TF_VAR_config=$(echo "$config_content" | jq -c .)" >> $GITHUB_ENV
       shell: bash
@@ -80,13 +80,13 @@ runs:
     - name: Configure AWS Credentials for Secrets Manager
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: "arn:aws:iam::${{ inputs.aws_account_id }}:role/gh-actions-$TEAM_NAME_NORMALIZED-secretsRole"
+        role-to-assume: "arn:aws:iam::${{ inputs.aws_account_id }}:role/gh-actions-$TEAM_NAME-secretsRole"
         aws-region: eu-central-1
 
     - name: Fetch Secrets from AWS Secrets Manager
       shell: bash
       run: |
-        SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id teams/$TEAM_NAME_NORMALIZED/secrets/konnect-sa-$TEAM_NAME_NORMALIZED --query SecretString --output text)
+        SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id teams/$TEAM_NAME/secrets/konnect-sa-$TEAM_NAME --query SecretString --output text)
         TOKEN_VALUE=$(echo $SECRET_JSON | jq -r '.token')
 
         echo "TOKEN_VALUE=$TOKEN_VALUE"
