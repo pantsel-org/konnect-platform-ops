@@ -91,37 +91,37 @@ runs:
         SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id teams/${{ env.TEAM_NAME }}/secrets/konnect-sa-${{ env.TEAM_NAME }} --query SecretString --output text)
         TOKEN_VALUE=$(echo $SECRET_JSON | jq -r '.token')
 
-        echo "TOKEN_VALUE=$TOKEN_VALUE"
+        echo "SYSTEM_ACCOUNT_TOKEN=$TOKEN_VALUE" >> $GITHUB_ENV
 
-    # - name: Fetch team information
-    #   id: fetch-team
-    #   run: |
-    #     # Make a request to the Konnect API to fetch required team information
-    #     # This is a GET request to https://global.api.konghq.com/v3/teams with a filter on the team name.
-    #     url_encoded_control_team_name=$(echo -n "$TEAM_NAME" | jq -s -R -r @uri)
-    #     response=$(curl -Gs -d "filter[name][eq]=${url_encoded_control_team_name}" -w "%{http_code}" "https://global.api.konghq.com/v3/teams" -H "Authorization: Bearer ${{ inputs.system_account_token }}" -H "Content-Type: application/json")
-    #     http_code=${response: -3}
-    #     response_body=${response:0:-3}
+    - name: Fetch team information
+      id: fetch-team
+      run: |
+        # Make a request to the Konnect API to fetch required team information
+        # This is a GET request to https://global.api.konghq.com/v3/teams with a filter on the team name.
+        url_encoded_control_team_name=$(echo -n "$TEAM_NAME" | jq -s -R -r @uri)
+        response=$(curl -Gs -d "filter[name][eq]=${url_encoded_control_team_name}" -w "%{http_code}" "https://global.api.konghq.com/v3/teams" -H "Authorization: Bearer ${{ env.SYSTEM_ACCOUNT_TOKEN }}" -H "Content-Type: application/json")
+        http_code=${response: -3}
+        response_body=${response:0:-3}
 
-    #     # Check the response code
-    #     if [ "$http_code" -ne 200 ]; then
-    #       echo "Request failed with status code $http_code"
-    #       echo "Response body: $response_body"
-    #       exit 1
-    #     fi
+        # Check the response code
+        if [ "$http_code" -ne 200 ]; then
+          echo "Request failed with status code $http_code"
+          echo "Response body: $response_body"
+          exit 1
+        fi
 
-    #     echo "Request succeeded with status code $http_code"
+        echo "Request succeeded with status code $http_code"
 
-    #     # Ensure only one team is returned in the response.
-    #     if [ $(echo "$response_body" | jq -r '.data | length') -ne 1 ]; then
-    #       echo "Expected one team to be returned, got $(echo "$response_body" | jq -r '.data | length')"
-    #       echo "Response body: $response_body"
-    #       exit 1
-    #     fi
+        # Ensure only one team is returned in the response.
+        if [ $(echo "$response_body" | jq -r '.data | length') -ne 1 ]; then
+          echo "Expected one team to be returned, got $(echo "$response_body" | jq -r '.data | length')"
+          echo "Response body: $response_body"
+          exit 1
+        fi
 
-    #     # Save the control plane info to an output variable
-    #     echo "::set-output name=team::$( echo $response_body | jq -c .data[0])"
-    #   shell: bash
+        # Save the control plane info to an output variable
+        echo "::set-output name=team::$( echo $response_body | jq -c .data[0])"
+      shell: bash
 
     # - name: Authenticate to MinIO using OIDC token
     #   shell: bash
