@@ -37,6 +37,16 @@ resource "konnect_system_account_role" "cp_creators" {
   account_id = konnect_system_account.this.id
 }
 
+### Add the control plane viewer role to every team system account
+resource "konnect_system_account_role" "cp_viewers" {
+
+  entity_id = "*"
+  entity_region    = "eu" # Hardcoded for now
+  entity_type_name = "Control Planes"
+  role_name        = "Viewer"
+  account_id = konnect_system_account.this.id
+}
+
 ### Add the api product creator role to every team system account
 resource "konnect_system_account_role" "ap_creators" {
   entity_id = "*"
@@ -45,6 +55,16 @@ resource "konnect_system_account_role" "ap_creators" {
   role_name        = "Creator"
   account_id = konnect_system_account.this.id
 }
+
+### Add the api product viewer role to every team system account
+resource "konnect_system_account_role" "ap_viewers" {
+  entity_id = "*"
+  entity_region    = "eu" # Hardcoded for now
+  entity_type_name = "API Products"
+  role_name        = "Viewer"
+  account_id = konnect_system_account.this.id
+}
+
 
 # Create an access token for every system account
 resource "konnect_system_account_access_token" "this" {
