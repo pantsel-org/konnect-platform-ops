@@ -161,14 +161,14 @@ runs:
         TF_VAR_team: ${{ env.TEAM }}
       working-directory: ${{env.TERRAFORM_DIR}}
 
-    # - name: Terraform Plan
-    #   shell: bash
-    #   if: ${{ inputs.action == 'provision' }}
-    #   run: |
-    #     terraform plan -out=tfplan
-    #   env:
-    #     TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
-    #   working-directory: ${{env.TERRAFORM_DIR}}
+    - name: Terraform Plan
+      shell: bash
+      if: ${{ inputs.action == 'provision' }}
+      run: |
+        terraform plan -out=tfplan
+      env:
+        TF_VAR_team: ${{ steps.fetch-team.outputs.team }}
+      working-directory: ${{env.TERRAFORM_DIR}}
 
     # - name: Terraform Apply
     #   shell: bash
