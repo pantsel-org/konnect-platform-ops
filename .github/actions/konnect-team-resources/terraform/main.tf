@@ -34,17 +34,17 @@ module "control_planes" {
   # cacert       = var.cacert
 }
 
-# module "vaults" {
-#   source = "./modules/vault"
+module "vaults" {
+  source = "./modules/vault"
 
-#   for_each = { for k, v in module.control_planes : v.control_plane.name => {
-#     name = v.control_plane.name, id = v.control_plane.id
-#     type = "Control Planes"
-#   } }
+  for_each = { for k, v in module.control_planes : v.control_plane.name => {
+    name = v.control_plane.name, id = v.control_plane.id
+    type = "Control Planes"
+  } }
 
-#   control_plane_name = lower(replace(each.value.name, " ", "-"))
-#   control_plane_id   = each.value.id
-# }
+  control_plane_name = lower(replace(each.value.name, " ", "-"))
+  control_plane_id   = each.value.id
+}
 
 
 # module "api_products" {
