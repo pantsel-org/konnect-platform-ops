@@ -5,8 +5,8 @@ variable "environment" {
   default     = "local"
 }
 
-variable "konnect_access_token" {
-  description = "The Konnect Personal Access Token to use for API requests"
+variable "system_account_access_token" {
+  description = "The system_account_access_token to use for API requests"
   type        = string
 }
 
