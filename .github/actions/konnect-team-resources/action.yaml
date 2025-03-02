@@ -77,13 +77,14 @@ runs:
         echo "TF_VAR_config=$(echo "$config_content" | jq -c .)" >> $GITHUB_ENV
 
         echo "SECRETS_ROLE_ARN=arn:aws:iam::${{ inputs.aws_account_id }}:role/gh-actions-$TEAM_NAME-secretsRole" >> $GITHUB_ENV
+        echo "S3_ROLE_ARN=arn:aws:iam::${{ inputs.aws_account_id }}:role/$TEAM_NAME-gh-oidc-s3-access-role" >> $GITHUB_ENV
       shell: bash
 
     - name: Configure AWS Credentials for Secrets Manager
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: "${{ env.SECRETS_ROLE_ARN }}"
-        aws-region: eu-central-1
+        aws-region: ${{ inputs.aws_region }}
 
     - name: Fetch Secrets from AWS Secrets Manager
       shell: bash
@@ -125,24 +126,28 @@ runs:
         echo "TEAM=$(echo $response_body | jq -c .data[0])" >> $GITHUB_ENV
       shell: bash
 
-    # - name: Authenticate to MinIO using OIDC token
-    #   shell: bash
-    #   run: |
-    #     mc alias set myminio http://your-minio-server:9000 \
-    #       --oidc-token "$TOKEN"
-        
-    #     # Verify access
-    #     mc ls myminio/konnect.team.kronos
+    - name: Assume S3 Access Role
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: "${{ env.S3_ROLE_ARN }}"
+        aws-region: ${{ inputs.aws_region }}
 
-    # - name: Create S3 bucket if required
-    #   if: ${{ inputs.action == 'provision' }}
-    #   shell: bash
-    #   run: |
-    #     ./create-minio-bucket.sh konnect $RESOURCE_TYPE.$TEAM_NAME_NORMALIZED
-    #   env:
-    #     AWS_ACCESS_KEY_ID: ${{ inputs.s3_access_key }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ inputs.s3_secret_key }}
-    #   working-directory: ${{ github.action_path }}/scripts
+    - name: Show Current AWS Identity
+      shell: bash
+      run: aws sts get-caller-identity
+
+    - name: Retrieve Temporary AWS Credentials
+      shell: bash
+      run: |
+        export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
+        export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
+        export AWS_SESSION_TOKEN=$(aws configure get aws_session_token)
+
+        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
+
+    
 
     # - name: Terraform Init
     #   shell: bash
