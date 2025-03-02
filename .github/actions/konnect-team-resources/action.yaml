@@ -11,6 +11,10 @@ inputs:
   aws_account_id:
     description: 'AWS account ID'
     required: true
+  konnect_region:
+    description: 'Konnect region'
+    required: true
+    default: 'eu'
   aws_region:
     description: 'AWS region'
     required: true
@@ -75,6 +79,9 @@ runs:
         echo "TEAM_NAME=$TEAM_NAME" >> $GITHUB_ENV
         echo "TERRAFORM_DIR=$TERRAFORM_DIR" >> $GITHUB_ENV
         echo "TF_VAR_config=$(echo "$config_content" | jq -c .)" >> $GITHUB_ENV
+
+        echo "TF_VAR_aws_region=${{ inputs.aws_region }}" >> $GITHUB_ENV
+        echo "TF_VAR_konnect_server_url=https://${{ inputs.konnect_region }}.api.konghq.com" >> $GITHUB_ENV
 
         echo "SECRETS_ROLE_ARN=arn:aws:iam::${{ inputs.aws_account_id }}:role/gh-actions-$TEAM_NAME-secretsRole" >> $GITHUB_ENV
         echo "S3_ROLE_ARN=arn:aws:iam::${{ inputs.aws_account_id }}:role/$TEAM_NAME-gh-oidc-s3-access-role" >> $GITHUB_ENV

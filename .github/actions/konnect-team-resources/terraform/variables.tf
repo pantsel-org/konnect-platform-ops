@@ -5,7 +5,7 @@ variable "environment" {
   default     = "local"
 }
 
-variable "konnect_personal_access_token" {
+variable "konnect_access_token" {
   description = "The Konnect Personal Access Token to use for API requests"
   type        = string
 }
@@ -27,12 +27,12 @@ variable "config" {
   type        = string
 }
 
-variable "cacert" {
-  description = "The content of the dataplane PEM certificate"
-  default     = ""
-  type        = string
-  sensitive   = true
-}
+# variable "cacert" {
+#   description = "The content of the dataplane PEM certificate"
+#   default     = ""
+#   type        = string
+#   sensitive   = true
+# }
 
 variable "team" {
   description = "The team to assign the resources to"

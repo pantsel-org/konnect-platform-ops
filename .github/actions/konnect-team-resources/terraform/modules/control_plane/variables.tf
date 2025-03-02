@@ -26,7 +26,7 @@ variable "auth_type" {
   default     = "pki_client_certs"
 }
 
-variable "cacert" {
-  description = "The CA certificate to use for the control plane"
-  type        = string
-}
+# variable "cacert" {
+#   description = "The CA certificate to use for the control plane"
+#   type        = string
+# }

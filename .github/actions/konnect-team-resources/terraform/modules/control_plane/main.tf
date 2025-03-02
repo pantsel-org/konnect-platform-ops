@@ -16,10 +16,10 @@ resource "konnect_gateway_control_plane" "this" {
   })
 }
 
-resource "konnect_gateway_data_plane_client_certificate" "this" {
-  cert             = var.cacert
-  control_plane_id = konnect_gateway_control_plane.this.id
-}
+# resource "konnect_gateway_data_plane_client_certificate" "this" {
+#   cert             = var.cacert
+#   control_plane_id = konnect_gateway_control_plane.this.id
+# }
 
 output "control_plane" {
   value = konnect_gateway_control_plane.this
