@@ -47,6 +47,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: eLco/setup-vault@v1
+        with:
+          vault_version: 1.8.7
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -114,6 +118,13 @@ jobs:
         run: |
           terraform apply -auto-approve tfplan
         working-directory: ${{ env.TERRAFORM_DIR }}
+
+      - name: Configure Vault
+        shell: bash
+        if: ${{ inputs.action == 'provision' }}
+        run: |
+          ./vault-pki-setup.sh https://vault-dev-2gcpdhyo5a-ez.a.run.app ${{ secrets.VAULT_TOKEN }} ${{ github.repository_owner }}
+        working-directory: ${{ github.workspace }}/scripts
 
       - name: Terraform destroy
         shell: bash
