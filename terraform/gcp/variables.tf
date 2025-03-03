@@ -19,4 +19,12 @@ variable "vault_root_token" {
   type    = string
 }
 
-# variable "gcp_credentials" {}
+variable "use_file_credentials" {
+  type    = bool
+  default = false  # Default: Use Workload Identity Federation
+}
+
+variable "gcp_credentials" {
+  type    = string
+  default = "gcp-key.json"  # Default path for credentials file
+}

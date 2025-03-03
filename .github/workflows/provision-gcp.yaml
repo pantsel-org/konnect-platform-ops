@@ -50,7 +50,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - id: 'auth'
+      - name: Authenticate with Google Cloud (workload_identity_provider)
         if: env.ACT != 'true'  # Only runs if NOT running locally
         uses: 'google-github-actions/auth@v2'
         with:
@@ -71,8 +71,7 @@ jobs:
         with:
           version: '>= 363.0.0'
 
-      # ToDo: Use Workload Identity Federation instead
-      - name: Authenticate with Google Cloud
+      - name: Authenticate with Google Cloud (local)
         if: env.ACT == 'true'  # Only runs if NOT running locally
         run: |
           echo "$GCP_CREDENTIALS" > gcp-key.json
@@ -82,28 +81,29 @@ jobs:
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
         working-directory: ${{ env.TERRAFORM_DIR }}
 
-      # - name: Init setup
-      #   shell: bash
-      #   run: |
+      - name: Init setup
+        shell: bash
+        run: |
 
-      #     if [ "$ACT" == "true" ]; then
-      #       gcloud auth activate-service-account terraform-sa@konnect-platform-ops.iam.gserviceaccount.com --key-file=gcp-key.json
-      #     fi
+          if [ "$ACT" == "true" ]; then
+            gcloud auth activate-service-account terraform-sa@konnect-platform-ops.iam.gserviceaccount.com --key-file=gcp-key.json
+          fi
           
-      #     gcloud config set project ${{ env.GCP_PROJECT }}
+          gcloud config set project ${{ env.GCP_PROJECT }}
 
-      #     gcloud services enable run.googleapis.com \
-      #       cloudbuild.googleapis.com \
-      #       cloudresourcemanager.googleapis.com \
-      #       secretmanager.googleapis.com \
-      #       sqladmin.googleapis.com \
-      #       iam.googleapis.com --project ${{ env.GCP_PROJECT }}
+          if ! gsutil ls -b gs://${{ env.GCP_VAULT_STORAGE_BUCKET }}; then
+            gsutil mb -l ${{ inputs.gcp_region }} gs://${{ env.GCP_VAULT_STORAGE_BUCKET }}/
+          fi
 
-      #     if ! gsutil ls -b gs://${{ env.GCP_VAULT_STORAGE_BUCKET }}; then
-      #       gsutil mb -l ${{ inputs.gcp_region }} gs://${{ env.GCP_VAULT_STORAGE_BUCKET }}/
-      #     fi
+        working-directory: ${{ env.TERRAFORM_DIR }}
 
-      #   working-directory: ${{ env.TERRAFORM_DIR }}
+      - name: Define TF variables
+        shell: bash
+        run: |
+          if [ "$ACT" == "true" ]; then
+            echo "TF_VAR_use_file_credentials=true" >> $GITHUB_ENV
+          fi
+        working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Terraform Init
         shell: bash
