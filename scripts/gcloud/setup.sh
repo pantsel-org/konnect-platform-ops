@@ -47,19 +47,16 @@ else
     echo "Service Account 'github-actions' already exists."
 fi
 
+gcloud projects add-iam-policy-binding $GC_PROJECT_ID \
+    --member="serviceAccount:github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com" \
+    --role="roles/owner"
+
 # Allow GitHub Workload Identity to Assume the SA
 gcloud iam service-accounts add-iam-policy-binding \
     github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com \
     --role="roles/iam.workloadIdentityUser" \
     --member="principalSet://iam.googleapis.com/projects/$(gcloud projects describe $GC_PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/$GITHUB_ORG/$GITHUB_REPO"
 
-gcloud iam service-accounts add-iam-policy-binding \
-    github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com \
-    --role="roles/owner" \
-    --member="principalSet://iam.googleapis.com/projects/$(gcloud projects describe $GC_PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/$GITHUB_ORG/$GITHUB_REPO"
-
-# Verify the IAM policy binding
-# gcloud iam service-accounts get-iam-policy github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com
 
 
 
