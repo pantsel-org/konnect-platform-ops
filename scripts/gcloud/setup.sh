@@ -48,17 +48,18 @@ else
 fi
 
 # Allow GitHub Workload Identity to Assume the SA
-if ! gcloud iam service-accounts get-iam-policy "github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com" --filter="bindings.members:principalSet://iam.googleapis.com/projects/$(gcloud projects describe $GC_PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/$GITHUB_ORG/$GITHUB_REPO" &>/dev/null; then
-    gcloud iam service-accounts add-iam-policy-binding \
-        github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com \
-        --role="roles/iam.workloadIdentityUser" \
-        --member="principalSet://iam.googleapis.com/projects/$(gcloud projects describe $GC_PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/$GITHUB_ORG/$GITHUB_REPO"
-else
-    echo "IAM policy binding for 'github-actions' already exists."
-fi
+gcloud iam service-accounts add-iam-policy-binding \
+    github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com \
+    --role="roles/iam.workloadIdentityUser" \
+    --member="principalSet://iam.googleapis.com/projects/$(gcloud projects describe $GC_PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/$GITHUB_ORG/$GITHUB_REPO"
+
+gcloud iam service-accounts add-iam-policy-binding \
+    github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com \
+    --role="roles/owner" \
+    --member="principalSet://iam.googleapis.com/projects/$(gcloud projects describe $GC_PROJECT_ID --format='value(projectNumber)')/locations/global/workloadIdentityPools/github-pool/attribute.repository/$GITHUB_ORG/$GITHUB_REPO"
 
 # Verify the IAM policy binding
-gcloud iam service-accounts get-iam-policy github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com
+# gcloud iam service-accounts get-iam-policy github-actions@$GC_PROJECT_ID.iam.gserviceaccount.com
 
 
 
