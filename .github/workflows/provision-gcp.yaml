@@ -66,7 +66,7 @@ jobs:
         working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Authenticate with Google Cloud (local)
-        if: env.ACT == 'true'  # Only runs if NOT running locally
+        if: env.ACT == 'true'  # Only runs if running locally
         run: |
           echo "$GCP_CREDENTIALS" > gcp-key.json
           echo "TF_VAR_gcp_credentials=$PWD/gcp-key.json" >> $GITHUB_ENV
