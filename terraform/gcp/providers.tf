@@ -1,5 +1,5 @@
 provider "google" {
-  credentials = var.use_file_credentials ? file(var.gcp_credentials) : null
+  credentials = file(var.gcp_credentials)
   project = var.project_id
   region  = var.region
 }
