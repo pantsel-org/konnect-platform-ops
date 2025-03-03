@@ -86,8 +86,10 @@ jobs:
         shell: bash
         run: |
 
-          gcloud auth activate-service-account terraform-sa@konnect-platform-ops.iam.gserviceaccount.com
-
+          if [ "$ACT" == "true" ]; then
+            gcloud auth activate-service-account terraform-sa@konnect-platform-ops.iam.gserviceaccount.com --key-file=gcp-key.json
+          fi
+          
           gcloud config set project ${{ env.GCP_PROJECT }}
 
           gcloud services enable run.googleapis.com \
