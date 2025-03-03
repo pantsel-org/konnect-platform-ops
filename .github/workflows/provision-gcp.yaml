@@ -133,13 +133,16 @@ jobs:
         id: tfapply
         run: |
           terraform apply -auto-approve tfplan
+
+          # Get vault_url from the terraform output
+          echo "VAULT_SERVER_URL=$(terraform output vault_url)" >> $GITHUB_ENV
         working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Configure Vault
         shell: bash
         if: ${{ inputs.action == 'provision' }}
         run: |
-          ./configure-vault.sh ${{ env.VAULT_URL }} ${{ secrets.VAULT_TOKEN }} ${{ github.repository_owner }}
+          ./configure-vault.sh ${{ env.VAULT_SERVER_URL }} ${{ secrets.VAULT_TOKEN }} ${{ github.repository_owner }}
         working-directory: ${{ github.workspace }}/scripts
 
       - name: Terraform destroy
