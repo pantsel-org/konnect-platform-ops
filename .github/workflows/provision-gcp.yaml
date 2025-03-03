@@ -89,7 +89,7 @@ jobs:
         with:
           version: '>= 363.0.0'
 
-      - name: Init setup
+      - name: Create GCP Vault Storage Bucket
         shell: bash
         run: |
 
