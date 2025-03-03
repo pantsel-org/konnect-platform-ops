@@ -65,6 +65,15 @@ jobs:
           echo "TF_VAR_gcp_credentials=$GOOGLE_APPLICATION_CREDENTIALS" >> $GITHUB_ENV
         working-directory: ${{ env.TERRAFORM_DIR }}
 
+      - name: Authenticate with Google Cloud (local)
+        if: env.ACT == 'true'  # Only runs if NOT running locally
+        run: |
+          echo "$GCP_CREDENTIALS" > gcp-key.json
+          echo "TF_VAR_gcp_credentials=$PWD/gcp-key.json" >> $GITHUB_ENV
+        shell: bash
+        env:
+          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        working-directory: ${{ env.TERRAFORM_DIR }}
 
       - uses: eLco/setup-vault@v1
         with:
@@ -79,16 +88,6 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
           version: '>= 363.0.0'
-
-      - name: Authenticate with Google Cloud (local)
-        if: env.ACT == 'true'  # Only runs if NOT running locally
-        run: |
-          echo "$GCP_CREDENTIALS" > gcp-key.json
-          echo "TF_VAR_gcp_credentials=$PWD/gcp-key.json" >> $GITHUB_ENV
-        shell: bash
-        env:
-          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
-        working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Init setup
         shell: bash
