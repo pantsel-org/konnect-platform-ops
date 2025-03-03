@@ -102,6 +102,9 @@ jobs:
             -backend-config="region=$AWS_REGION" \
             -backend-config="access_key=$AWS_ACCESS_KEY_ID" \
             -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
+
+          # Get vault_url from the terraform output
+          echo "VAULT_URL=$(terraform output vault_url)" >> $GITHUB_ENV
         working-directory: ${{ env.TERRAFORM_DIR }}
 
       - name: Terraform Plan
@@ -123,7 +126,7 @@ jobs:
         shell: bash
         if: ${{ inputs.action == 'provision' }}
         run: |
-          ./vault-pki-setup.sh https://vault-dev-2gcpdhyo5a-ez.a.run.app ${{ secrets.VAULT_TOKEN }} ${{ github.repository_owner }}
+          ./vault-pki-setup.sh ${{ env.VAULT_URL }} ${{ secrets.VAULT_TOKEN }} ${{ github.repository_owner }}
         working-directory: ${{ github.workspace }}/scripts
 
       - name: Terraform destroy
