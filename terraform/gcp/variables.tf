@@ -19,4 +19,4 @@ variable "vault_root_token" {
   type    = string
 }
 
-variable "gcp_credentials" {}
+# variable "gcp_credentials" {}
